@@ -1,6 +1,5 @@
 # API Rate Limiting With Bucket4J and Redis
 
-- In this tutorial we will learn how to implement api rate limiting in a scaled service. 
 - We will use the [Bucket4J](https://github.com/bucket4j/bucket4j) library to implement it and we will use [Redis](https://redis.io/) as a distributed cache
 - Here we can also set diffrent Rate Limit by Users
 
@@ -37,18 +36,14 @@ Internally, Bucket4j allows us to plug in any implementation of the Java JCache 
 
 ### Project Implementation
 
-In this Project i am Using Redis, Mysql, Spring boot etc 
+In this Project i am Using Redis, Spring boot. 
 
-Mysql - here we stored users limit. ex User A is allowed to call 10 API calls in 1 Minute, User B is allowed to call 50 API Calls in 1 Minute
+we stored users limit in-memory. ex User A is allowed to call 10 API calls in 1 Minute, User B is allowed to call 50 API Calls in 1 Minute
 
-Redis - here we stored Key Values are stored as well as we cached Mysql User Table also.
+Redis - here we stored Key Values.
 
 ### Prerequisite
 
-- Mysql should be running 
-- create a database with name sample
-- execute the script [Create Table Script](https://github.com/kuldeepsingh99/rate-limit/blob/main/src/main/resources/create-table.sql)
-- Insert few record with some limit ex. User A with limit 10 , User B with Limit 20 etc
 - Redis Instance should be running on 6379 port
 
 ### Important Configuration
@@ -78,7 +73,6 @@ Firstly, we need to start our Redis server. Let's say we have a Redis server run
 - This file creates a configuration object that we can use to create a connection.
 - Creates a cache manager using the configuration object. This will internally create a connection to the Redis instance and create a hash called "cache" on it.
 - Creates a proxy manager that will be used to access the cache. Whatever our application tries to cache using the JCache API, it will be cached on the Redis instance inside the hash named "cache".
-- "userList" is used to cache User Table Data, this is explained in UserService.java
 
 ```
 @Configuration
@@ -116,8 +110,6 @@ public class RedisConfig {
 @Service
 public class RateLimiter {
 
-	@Autowired
-	UserService userService;
 
 	@Autowired
 	ProxyManager<String> proxyManager;
@@ -158,7 +150,7 @@ public class RateLimiter {
 - to make it generic a filter has been created
 - all the request URL that start with /v1 are secured with tokens
 - user id need to pass in header
-- if user exist and and have a valid token, the request will too to controller Layer else it will thror 409 (Too many Request Exception) 
+- if user exist and and have a valid token, the request will too to controller Layer else it will thror 429 (Too many Request Exception) 
 ```
 @Component
 public class RequestFilter extends OncePerRequestFilter {
