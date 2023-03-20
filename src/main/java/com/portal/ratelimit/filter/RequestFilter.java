@@ -29,6 +29,7 @@ public class RequestFilter extends OncePerRequestFilter {
 			String tenantId = request.getHeader("X-Tenant");
 			if(StringUtils.isNotBlank(tenantId)) {
 				Bucket bucket = rateLimiter.resolveBucket(tenantId);
+				System.out.println("Tokens before consuming: " + bucket.getAvailableTokens());
 				if(bucket.tryConsume(1)) {
 					filterChain.doFilter(request, response);
 				} else {

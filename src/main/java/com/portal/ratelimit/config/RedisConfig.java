@@ -25,7 +25,6 @@ public class RedisConfig {
     public CacheManager cacheManager(Config config) {
         CacheManager manager = Caching.getCachingProvider().getCacheManager();
         manager.createCache("cache", RedissonConfiguration.fromConfig(config));
-        manager.createCache("userList", RedissonConfiguration.fromConfig(config));
         return manager;
     }
 
